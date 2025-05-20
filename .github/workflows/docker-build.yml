@@ -1,34 +1,33 @@
-name: Build and Push Docker Images
+name: Build and Push Web + DB Images
 
 on:
   push:
-    branches: [ "master" ] # or main
+    branches: [ master ]  # Falls du später auf "main" wechselst, hier anpassen
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write  # 🔑 WICHTIG: damit GHCR funktioniert
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Web Image
-        run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/web-app:latest ./app
+    - name: Build and push Web image
+      run: |
+        docker build -t ghcr.io/leoneub1/assignment3-web:latest ./web
+        docker push ghcr.io/leoneub1/assignment3-web:latest
 
-      - name: Build DB Image (optional)
-        run: |
-          docker pull postgres
-          docker tag postgres ghcr.io/${{ github.repository_owner }}/postgres:latest
-
-      - name: Push Images
-        run: |
-          docker push ghcr.io/${{ github.repository_owner }}/web-app:latest
-          docker push ghcr.io/${{ github.repository_owner }}/postgres:latest
+    - name: Build and push DB image
+      run: |
+        docker build -t ghcr.io/leoneub1/assignment3-db:latest ./db
+        docker push ghcr.io/leoneub1/assignment3-db:latest
