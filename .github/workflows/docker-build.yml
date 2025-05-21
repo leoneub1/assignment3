@@ -10,7 +10,7 @@ jobs:
 
     permissions:
       contents: read
-      packages: write  # 🔑 WICHTIG: damit GHCR funktioniert
+      packages: write 
 
     steps:
     - uses: actions/checkout@v3
